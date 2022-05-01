@@ -1,0 +1,118 @@
+* {
+  font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  background-color: #2958459d;
+  font-size: 1rem;
+  color: white;
+  margin-left: 12rem;
+  margin-right: 12rem;
+}
+
+.titleHeader {
+  font-size: 4rem;
+  color: white;
+  font-family: 'Londrina Outline', 'Montserrat', sans-serif;
+  text-align: center;
+}
+
+.menu {
+  font-size: 1rem;
+  color: white;
+  text-align: center;
+  /* border: 2px solid #14213d; */
+}
+
+h3 {
+  color: white;
+}
+
+#gameResultLS{
+  font-size: 3rem;
+  color: white; 
+  font-family: 'Londrina Outline', 'Montserrat', sans-serif;
+  margin-bottom: .5rem;
+  margin-top: .5rem;
+}
+
+img{
+  height: 11rem;
+}
+li {
+  list-style-type: none;
+  display: inline;
+}
+.hidden {
+  display: none;
+}
+
+.playersContainer {
+  height: 40%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.player1, .player2 {
+  height: 90%;
+  /* border: 2px solid white; */
+  padding: 1rem;
+  width: 50%;
+  height: 500px;
+}
+
+/* BUTTON */
+
+#player1Stay, #player1Hit, #player2Stay, #player2Hit {
+  border: 1px solid white;
+  background-color: rgba(250, 239, 117, 0.801);
+  border-radius: 5px;
+  padding: .5rem .5rem;
+  margin-bottom: .5rem;
+  cursor: pointer;
+}
+
+.button {
+  padding: 1rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 180px;
+  /* position: absolute; */
+  /* bottom: -25px;
+  right: -20px; */
+  border: 2px solid white;
+  background-color: rgba(250, 239, 117, 0.801);
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  margin: .2rem;
+}
+.button:active, #player1Stay:active, #player1Hit:active, #player2Stay:active, #player2Hit:active  {
+  transform: scale(0.98);
+}
+
+
+/******************************************
+/* ADDITIONAL STYLES
+/*******************************************/
+
+/* On mobile, please make all sections stack  */
+@media all and (max-width:980px){
+  body {
+    margin-left: 2rem;
+    margin-right: 2rem;
+  }
+}
+
+@media all and (max-width:300px){
+  body {
+    margin-left: 2rem;
+    margin-right: 2rem;
+  }
+  img{
+    height: 5rem;
+  }
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    	<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link href="https://fonts.googleapis.com/css2?family=Londrina+Outline&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&&display=swap" rel="stylesheet" />
+		<link rel="stylesheet" href="style.css" />
+		<title>Blackjack</title>
+
+	</head>
+	<body>
+		
+		<header>
+			<h1 class ='titleHeader'>Blackjack</h1>
+		</header>
+
+		<section class="menu">
+			<button id="newDeckButtonLS" class="button">NEW DECK</button>
+			<button id="dealButtonLS" class="button">DEAL CARDS</button>
+			<h3>Cards Remaining: <span id="cardsRemainLS"></span></h3>
+			<h3 id="gameResultLS" class="hidden"></h3>
+		</section>
+
+		<div class="playersContainer">
+			<section class="player1">
+				<h2>Player 1</h2>
+						<p id="player1_sum"></p>
+						<button id="player1Stay" class="hidden" class="stayButton">STAND</button>
+						<button id="player1Hit" class="hidden" class="hitButton">HIT</button>
+						<br>
+						<div>
+								<img class="inital_cards" id="player1LS_first" src="" alt=""> 
+								<img class="inital_cards" id="player1LS_second" src="" alt=""> 
+								<div id="player1_div"></div>
+						</div>		
+			</section>
+
+			<section class="player2">
+				<h2>Player 2</h2>
+						<p id="player2_sum"></p>
+						<button id="player2Stay" class="hidden" class="stayButton">STAND</button>
+						<button id="player2Hit" class="hidden" class="hitButton">HIT</button>
+						<br>
+						<div>
+								<img class="inital_cards" id="player2LS_first" src="" alt="">
+								<img class="inital_cards" id="player2LS_second" src="" alt="">
+								<div id="player2_div"></div>
+						</div>
+			</section>
+		</div>
+		
+	</body>
+	<script type="text/javascript" src="main.js"></script>
+
+</html>
