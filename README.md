@@ -1,6 +1,6 @@
 # ⭐ Blackjack-game
 
-Check it out:  https://blackjack21game.netlify.app/
+Visit my site:  https://blackjack21game.netlify.app/
  
 Popular 2-player Blackjack game
 
