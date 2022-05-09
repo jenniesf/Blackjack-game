@@ -1,109 +1,90 @@
 
-// RUN ON PAGE LOAD
+// PAGE LOAD - GLOBAL VAR.
 let player1_hand;
 let player2_hand;
+let numberOfDecks = 1;
 
-const deckURLLS =  `https://www.deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1`  // DECK API URL
+const deckURLLS =  `https://www.deckofcardsapi.com/api/deck/new/shuffle/?deck_count=${numberOfDecks}`  // DECK API URL
 document.querySelector('#cardsRemainLS').innerHTML = localStorage.getItem('Cards_remaining')  // INPUT CARDS REMAINING FROM LOCAL STORAGE ON DOM
-document.querySelector('#newDeckButtonLS').addEventListener('click', drawNewDeck)   // LISTEN FOR CLICK ON NEW DECK
+document.querySelector('#newDeckButtonLS').addEventListener('click', drawNewDeck)   // CLICK ON NEW DECK
+document.querySelector('#dealButtonLS').addEventListener('click', dealCards)  // DRAW CARDS
+document.querySelector('#player1Hit').addEventListener('click', player1Hit )  // LISTEN FOR "HIT" BUTTON CLICK
+document.querySelector('#player2Hit').addEventListener('click', player2Hit )  // LISTEN FOR "HIT" BUTTON CLICK
+document.querySelector('#player2Stay').addEventListener('click', player2Stay )  // LISTEN FOR "STAY" BUTTON CLICK
+document.querySelector('#player1Stay').addEventListener('click', player1Stay )  // LISTEN FOR "STAY" BUTTON CLICK
 
-// FUNCTION WHEN CLICK ON DRAW NEW DECK
+// CLICK ON DRAW NEW DECK
 function drawNewDeck () {
-
-  // API TEMPLATE:
     fetch(deckURLLS)
-        .then(res => res.json()) // parse response as JSON
+        .then(res => res.json()) 
         .then(data => {
-
-          console.log(data) //see what data brings back
-          deckID = data.deck_id // grab deck ID and put into variable
-
-          localStorage.setItem('Deck_ID', deckID)  // SET DECK ID TO LOCAL STORAGE
-          localStorage.setItem('Cards_remaining', data.remaining)  // SET CARDS REMAINING TO LOCAL STORAGE
-
-          // DOM PRESENTATION CLEAN UP ETC.
-          document.querySelector('#cardsRemainLS').innerHTML = data.remaining
-          // REMOVE ALL CARD IMAGES
-            let intialCards = document.querySelectorAll('.inital_cards')
-            intialCards.forEach( el => el.src = '')
-            document.querySelectorAll('#player1_div img').forEach( img => img.remove()) //remove all appendedChild cards img
-            document.querySelectorAll('#player2_div img').forEach( img => img.remove()) //remove all appendedChild cards img
-          document.querySelector('#gameResultLS').innerHTML = ''
+          deckID = data.deck_id // grab deck ID
+          localStorage.setItem('Deck_ID', deckID)  // DECK ID TO LS
+          localStorage.setItem('Cards_remaining', data.remaining)  // CARDS REMAINING TO LS
+          // RESET DOM FOR NEW DECK
+          document.querySelector('#cardsRemainLS').innerHTML = data.remaining //CARDS REMAINING TO DOM
+          let intialCards = document.querySelectorAll('.inital_cards')
+          intialCards.forEach( el => el.src = '')
+          resetDom()
           document.querySelector('#dealButtonLS').classList.remove('hidden') 
-          
-         hideHitStayButtons()
-        
-          
+          hideHitStayButtons()
           document.querySelector('#player1_sum').innerHTML = ''
           document.querySelector('#player2_sum').innerHTML = ''
-          
         })
         .catch(err => {
             console.log(`error ${err}`)
         });
 }
 
+// reset DOM - images and game results
+function resetDom () {
+  document.querySelectorAll('#player1_div img').forEach( img => img.remove()) //remove all cards imgs
+  document.querySelectorAll('#player2_div img').forEach( img => img.remove()) //remove all cards imgs
+  document.querySelector('#gameResultLS').innerHTML = ''
+}
+
+// HIDE HIT AND STAND BUTTONS
 function hideHitStayButtons(){
   document.querySelector('#player1Hit').classList.add('hidden') 
   document.querySelector('#player1Stay').classList.add('hidden') 
   document.querySelector('#player2Hit').classList.add('hidden')
   document.querySelector('#player2Stay').classList.add('hidden')
 }
-
+// SHOW HIT AND STAND BUTTONS
 function showHitStayButtons(){
   document.querySelector('#player1Hit').classList.remove('hidden') 
   document.querySelector('#player1Stay').classList.remove('hidden') 
   document.querySelector('#player2Hit').classList.remove('hidden')
   document.querySelector('#player2Stay').classList.remove('hidden')
 }
-
-
-// ******************************
 // CLICK ON DRAW INTIAL 4 CARDS
-// ******************************
-document.querySelector('#dealButtonLS').addEventListener('click', dealCards)  // LISTEN FOR BUTTON CLICK
-
 function dealCards () {
-  // clean up DOM when new deal
-  document.querySelectorAll('#player1_div img').forEach( img => img.remove()) //remove all appendedChild cards img
-  document.querySelectorAll('#player2_div img').forEach( img => img.remove()) //remove all appendedChild cards img
-  document.querySelector('#gameResultLS').innerHTML = ''
-
+    resetDom()
     let LSdeckID = localStorage.getItem('Deck_ID')      // GRAB DECKID FROM LOCAL STORAGE
     const url =  `https://www.deckofcardsapi.com/api/deck/${LSdeckID}/draw/?count=4`  // LINK TO DRAW CARDS
   // API TEMPLATE:
     fetch(url)
-        .then(res => res.json()) // parse response as JSON
+        .then(res => res.json())
         .then(data => {
-          console.log(data) //see what data brings back
-  
           document.querySelector('#player1LS_first').src = data.cards[0].image  // ADD CARD IMAGE TO DOM
           document.querySelector('#player1LS_second').src = data.cards[1].image  // ADD CARD IMAGE TO DOM
           document.querySelector('#player2LS_first').src = data.cards[2].image  // ADD CARD IMAGE TO DOM
           document.querySelector('#player2LS_second').src = data.cards[3].image  // ADD CARD IMAGE TO DOM
 
-          // get player hand, convert to number, return array
-          player1_hand =   convertToNo(   [  data.cards[0].value  ,  data.cards[1].value   ]   )
-          player2_hand =   convertToNo(   [  data.cards[2].value  ,  data.cards[3].value   ]   )
-          // log players hand
-          console.log( player1_hand  ) // [ 8, ACE ] array
-          console.log( player2_hand  )
+          // get player hand, convert face cards to numbers, return array
+          player1_hand = convertToNo( [data.cards[0].value, data.cards[1].value] )
+          player2_hand = convertToNo( [data.cards[2].value, data.cards[3].value] )
 
-           // Determine hand values
-           let player1_handvalue = getHandValue ( player1_hand  )
-           let player2_handvalue = getHandValue ( player2_hand  )
-           console.log( player1_handvalue  )
-           console.log( player2_handvalue  )
+          // Determine hand values
+          let player1_handvalue = getHandValue (player1_hand)
+          let player2_handvalue = getHandValue (player2_hand)
 
           // check for ACES   - should return true or false - play twice for 2 aces max on draw
-          player1_handvalue = checkForAce( player1_hand , player1_handvalue  )
-          player2_handvalue = checkForAce( player2_hand , player2_handvalue  )
-
-          player1_handvalue = checkForAce( player1_hand , player1_handvalue  )
-          player2_handvalue = checkForAce( player2_hand , player2_handvalue  )
-
-          console.log( player1_hand )
-          console.log( player2_hand )
+          let numberOfAces = numberOfDecks * 4 // determine how many aces in deck
+          for ( let i = 0 ; i < numberOfAces ; i++) {
+            player1_handvalue = checkForAce( player1_hand , player1_handvalue  )
+            player2_handvalue = checkForAce( player2_hand , player2_handvalue  )
+          }
 
           // play game- determine result & display HIT/STAY buttons
           determineGame ( player1_handvalue , player2_handvalue )
@@ -122,8 +103,7 @@ function dealCards () {
 }
 
 // CONVERT FACE CARDS TO A NUMBER
-function convertToNo (cardsArray) {    // [ jack, ace ]
-    console.log(cardsArray)
+function convertToNo (cardsArray) {    
     let convertedCardsArr = []
     for (let i = 0; i < cardsArray.length ; i++ ) {
       if (  cardsArray[i] ==  'JACK' ||   cardsArray[i] ==  'QUEEN' || cardsArray[i] ==  'KING' ) {
@@ -134,7 +114,7 @@ function convertToNo (cardsArray) {    // [ jack, ace ]
         convertedCardsArr.push( Number(cardsArray[i]) )
       }
     }
-     return convertedCardsArr // return array [ 10 , 11] for jack, ace
+     return convertedCardsArr 
 }
 
 // DETERMINE HAND VALUE FROM ARRAY -- parameter is array
@@ -143,7 +123,6 @@ function getHandValue (playerhand ) {
   for (let i = 0; i < playerhand.length; i++) {
       handValue  += playerhand[i] 
   }
-  console.log(handValue)
   return handValue
 }
 
@@ -155,9 +134,6 @@ function checkForAce ( playerhand , handValue ) {
                       isAce = true
               } 
       }
-      console.log(isAce)
-      console.log(handValue)
-
       if ( handValue > 21 && isAce == true) {
         let index = playerhand.indexOf( 11 ) 
         if (index !== -1 ) {
@@ -166,19 +142,17 @@ function checkForAce ( playerhand , handValue ) {
         } else {
                 return handValue
         }
-        console.log( playerhand )
         return getNewHandValue ( playerhand ) // new playerhand
 }
-
-function getNewHandValue (playerhand) {
-  let newHandValue = 0
-  for (let i = 0; i < playerhand.length; i++) {
-      newHandValue  += playerhand[i] 
+  function getNewHandValue (playerhand) {
+    let newHandValue = 0
+    for (let i = 0; i < playerhand.length; i++) {
+        newHandValue  += playerhand[i] 
+    }
+    return newHandValue
   }
-  return newHandValue
-}
 
-// DETERMINE WINNER/RESULTS (initial cards)
+// DETERMINE WINNER (initial 4 cards)
 function determineGame (player1, player2) {
   if (player1 == 21 && player2 == 21 ) {
     document.querySelector('#gameResultLS').classList.remove('hidden') 
@@ -201,11 +175,7 @@ function determineGame (player1, player2) {
   }
 }
 
-// ********************
 //CLICK HIT - PLAYER 1
-// ********************
-document.querySelector('#player1Hit').addEventListener('click', player1Hit )  // LISTEN FOR "HIT" BUTTON CLICK
-
 function player1Hit () {
     let LSdeckID = localStorage.getItem('Deck_ID')      // GRAB DECKID FROM LOCAL STORAGE
     const url =  `https://www.deckofcardsapi.com/api/deck/${LSdeckID}/draw/?count=1`  // LINK TO DRAW CARDS
@@ -213,7 +183,6 @@ function player1Hit () {
     fetch(url)
         .then(res => res.json()) // parse response as JSON
         .then(data => {
-          console.log(data) //see what data brings back
           
           // ADD NEW CARD IMAGE TO DOM - USING APPENDCHILD
           let player1NewCard_img = document.createElement('img')
@@ -221,37 +190,20 @@ function player1Hit () {
           let ulonDom = document.getElementById('player1_div')
           ulonDom.appendChild(player1NewCard_img)
 
-      console.log( player1_hand  ) // log current hand
+          // push new card into player hand
+          player1_hand.push( data.cards[0].value  )
 
-      // push new card into player hand
-      player1_hand.push( data.cards[0].value  )
+          // convert to number, return array
+          let player1_hit_hand =   convertToNo( player1_hand )     
 
-      // convert to number, return array
-      let player1_hit_hand =   convertToNo( player1_hand )     
-      console.log(player1_hit_hand)  // return current hand array
+          let handValue = getHandValue( player1_hit_hand )
+          // check for Aces
+          let numberOfAces = numberOfDecks * 4 // determine how many aces in deck
+          for ( let i = 1 ; i <= numberOfAces ; i++) {  
+            handValue =  checkForAce( player1_hit_hand  , handValue  )
+        }     
 
-      let handValue = getHandValue( player1_hit_hand )
-      console.log (   handValue )  // get total card value
-
-      handValue =  checkForAce( player1_hit_hand  , handValue  )  // check for ace 
-      // run ace function a total 4 times (max ace is 4)
-      handValue =  checkForAce( player1_hit_hand  , handValue  )  
-      handValue =  checkForAce( player1_hit_hand  , handValue  )  
-      handValue =  checkForAce( player1_hit_hand  , handValue  )  
-      console.log( handValue)                                    
-      console.log ( player1_hit_hand )
-
-        // determine if player one WIN OR BUST
-      if ( handValue == 21 ) {
-        document.querySelector('#gameResultLS').classList.remove('hidden')
-        document.querySelector('#gameResultLS').innerHTML = "PLAYER 1 IS THE WINNER"
-        hideHitStayButtons()
-
-      } else if ( handValue > 21 ) {
-        document.querySelector('#gameResultLS').classList.remove('hidden')
-        document.querySelector('#gameResultLS').innerHTML = "PLAYER 1 BUSTED"
-        hideHitStayButtons()
-      } 
+      checkWinOnHit(handValue,'1')
 
       // INPUT SUM ON DOM
       document.querySelector('#player1_sum').innerHTML = handValue
@@ -264,11 +216,7 @@ function player1Hit () {
         });
 }
 
-// ********************
 //CLICK HIT - PLAYER 2
-// ********************
-document.querySelector('#player2Hit').addEventListener('click', player2Hit )  // LISTEN FOR "HIT" BUTTON CLICK
-
 function player2Hit () {
     let LSdeckID = localStorage.getItem('Deck_ID')      // GRAB DECKID FROM LOCAL STORAGE
     const url =  `https://www.deckofcardsapi.com/api/deck/${LSdeckID}/draw/?count=1`  // LINK TO DRAW CARDS
@@ -276,7 +224,6 @@ function player2Hit () {
     fetch(url)
         .then(res => res.json()) // parse response as JSON
         .then(data => {
-          console.log(data) //see what data brings back
           
           // ADD NEW CARD IMAGE TO DOM - USING APPENDCHILD
           let player2NewCard_img = document.createElement('img')
@@ -284,37 +231,20 @@ function player2Hit () {
           let ulonDom = document.getElementById('player2_div')
           ulonDom.appendChild(player2NewCard_img)
 
-      console.log( player2_hand  ) // log current hand
-
       // push new card into player hand
       player2_hand.push( data.cards[0].value  )
 
       // convert to number, return array
       let player2_hit_hand =   convertToNo( player2_hand )     
-      console.log(player2_hit_hand)  // return current hand array
 
       let handValue = getHandValue( player2_hit_hand )
-      console.log (   handValue )  // get total card value
 
-      handValue =  checkForAce( player2_hit_hand  , handValue  )  // check for ace 
-      // run ace function a total 4 times (max ace is 4)
-      handValue =  checkForAce( player2_hit_hand  , handValue  )  
-      handValue =  checkForAce( player2_hit_hand  , handValue  )  
-      handValue =  checkForAce( player2_hit_hand  , handValue  )  
-      console.log( handValue)                                    
-      console.log ( player2_hit_hand )
-
-        // determine if player one WIN OR BUST
-      if ( handValue == 21 ) {
-        document.querySelector('#gameResultLS').classList.remove('hidden')
-        document.querySelector('#gameResultLS').innerHTML = "PLAYER 2 IS THE WINNER"
-        hideHitStayButtons()
-
-      } else if ( handValue > 21 ) {
-        document.querySelector('#gameResultLS').classList.remove('hidden')
-        document.querySelector('#gameResultLS').innerHTML = "PLAYER 2 BUSTED"
-        hideHitStayButtons()
-      } 
+      // check Aces
+      let numberOfAces = numberOfDecks * 4 
+      for ( let i = 1 ; i <= numberOfAces ; i++) {
+          handValue =  checkForAce( player2_hit_hand  , handValue  )  
+      }    
+      checkWinOnHit(handValue,'2')
 
       // INPUT SUM ON DOM
       document.querySelector('#player2_sum').innerHTML = handValue
@@ -327,17 +257,36 @@ function player2Hit () {
         });
 }
 
+// CHECK WINNERS WHEN HIT NEW CARD
+function checkWinOnHit (handValue,player) {
+  if ( handValue == 21 ) {
+    document.querySelector('#gameResultLS').classList.remove('hidden')
+    document.querySelector('#gameResultLS').innerHTML = `PLAYER ${player} IS THE WINNER`
+    hideHitStayButtons()
 
-// ********************
+  } else if ( handValue > 21 ) {
+    document.querySelector('#gameResultLS').classList.remove('hidden')
+    document.querySelector('#gameResultLS').innerHTML = `PLAYER ${player} BUSTED`
+    hideHitStayButtons()
+  } 
+}
+
 //CLICK STAY - PLAYER 1
-// ********************
-document.querySelector('#player1Stay').addEventListener('click', player1Stay )  // LISTEN FOR "STAY" BUTTON CLICK
 function player1Stay () {
+  document.querySelector('#player1Hit').classList.add('hidden') 
+  checkWin()
+}
 
+//CLICK STAY - PLAYER 2
+function player2Stay () {
+  document.querySelector('#player2Hit').classList.add('hidden') 
+  checkWin()
+}
+
+//CHECK WIN (STAND BUTTONS)
+function checkWin () {
   let player2Value = Number(document.querySelector('#player2_sum').innerHTML)
   let player1Value = Number(document.querySelector('#player1_sum').innerHTML)
-
-  document.querySelector('#player1Hit').classList.add('hidden') 
 
   if( document.querySelector('#player2Hit').classList.contains('hidden') && document.querySelector('#player1Hit').classList.contains('hidden')  ) {
     if( player1Value > player2Value ) {
@@ -353,43 +302,7 @@ function player1Stay () {
      document.querySelector('#gameResultLS').classList.remove('hidden')
      hideHitStayButtons()
     }
-}
- 
-}
-// ********************
-//CLICK STAY - PLAYER 2
-// ********************
-document.querySelector('#player2Stay').addEventListener('click', player2Stay )  // LISTEN FOR "STAY" BUTTON CLICK
-function player2Stay () {
-
-  let player2Value = Number(document.querySelector('#player2_sum').innerHTML)
-  let player1Value = Number(document.querySelector('#player1_sum').innerHTML)
-
-  document.querySelector('#player2Hit').classList.add('hidden') 
-  if( document.querySelector('#player2Hit').classList.contains('hidden') && document.querySelector('#player1Hit').classList.contains('hidden')  ) {
-       if( player1Value > player2Value ) {
-          document.querySelector('#gameResultLS').innerHTML = "PLAYER 1 IS THE WINNER"
-          document.querySelector('#gameResultLS').classList.remove('hidden')
-          hideHitStayButtons()
-       } else if (  player1Value < player2Value    ) {
-         document.querySelector('#gameResultLS').innerHTML = "PLAYER 2 IS THE WINNER"
-         document.querySelector('#gameResultLS').classList.remove('hidden')
-         hideHitStayButtons()
-       } else {
-        document.querySelector('#gameResultLS').innerHTML = "TIED GAME"
-        document.querySelector('#gameResultLS').classList.remove('hidden')
-        hideHitStayButtons()
-       }
-  }
+  } 
 }
 
 
-// APPEND EXAMPLE-- ADDING LI TO UL
-// FUNCTION TO ADD BOOKS TO DOM
-// function addBookToDom (bookTitle) {
-//   let ulonDom = document.getElementById('bookList')
-//   let liOnDom = document.createElement('li')
-
-//   liOnDom.appendChild(document.createTextNode(bookTitle))
-//   ulonDom.appendChild(liOnDom)
-// }
