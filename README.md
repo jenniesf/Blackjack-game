@@ -11,6 +11,9 @@ Javascript<br>
 HTML <br>
 CSS
 
+🔥 <strong>Optimizations:</strong> <br>
+- All users to choose the number of card decks 
+
 🔥 <strong>Lessons learned:</strong> 
 - Improving problem-solving skills<br>
 - Increasing knowledge of programming concepts<br>
