@@ -12,7 +12,7 @@ HTML <br>
 CSS
 
 🔥 <strong>Optimizations:</strong> <br>
-- All users to choose the number of card decks 
+- Allow users to choose the number of card decks 
 
 🔥 <strong>Lessons learned:</strong> 
 - Improving problem-solving skills<br>
